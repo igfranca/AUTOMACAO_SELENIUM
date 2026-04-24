@@ -1,37 +1,78 @@
 package br.com.vivo.primeiraautomacao;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class CartTests {
 
-  @Test
-  public void testCreateCart(){
+  private static WebDriver driver;
 
-    WebDriverManager.firefoxdriver().setup();
-    WebDriver driver = new ChromeDriver();
+  @BeforeClass
+  public static void setUp() {
 
-    //Espera implícita, aguardar 20 segundos ou clicar se estiver disponível
+    WebDriverManager.chromedriver().setup();
+    driver = new ChromeDriver();
+    driver.manage().window().maximize();
     driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
 
-    //Maximiza janela
-    driver.manage().window().maximize();
+  }
+
+  @Test
+  public void ct1testCreateCart(){
 
     //Navegar para o site
     driver.get("https://store.vivo.com.br/");
 
+    //Clicar no botão 'Continuar e fechar'
     driver.findElement(By.xpath("//button[@id='consent']")).click();
+
+    //Clicar no menu 'Celulares'
     driver.findElement(By.xpath("//a[@title='Celulares']")).click();
-    driver.findElement(By.xpath("(//a[@class='product-card product-card--grid'])[1]")).click();
+
+    //Clicar no primeiro aparelho do menu 'Celulares'
+    driver.findElement(By.xpath("(//a[@class='product-card product-card--grid'])[2]")).click();
+
+    //Captura o preço do produto
+    String precoProduto = driver.findElement(By.xpath("(//div[@aria-label='new item price']//p[contains(text(),'R$')])[1]")).getText();
+    System.out.println("Preço do produto: " + precoProduto);
+
+    //Clicar no botão colocar no carrinho
+    driver.findElement(By.xpath("//span[normalize-space()='Colocar no carrinho']")).click();
 
 
+    WebDriverWait espera = new WebDriverWait(driver, Duration.ofSeconds(30));
 
-    //Encerra o processo do chromeDriver no Windows
-    driver.quit();
+    WebElement itemNoCarrinho =  espera.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='item-description']")));
+
+    assertTrue("O produto deve estar visível no carrinho", itemNoCarrinho.isDisplayed());
+
+    String precoCarrinho = driver.findElement(By.id("total-value")).getText();
+    System.out.println("Valor total do carrinho: " + precoCarrinho);
+
+    assertEquals("Valor total do carrinho deve ser igual ao preço do produto", precoProduto, precoCarrinho);
+
  }
+
+  @Test
+  public void ct2cadastrarCliente(){
+    driver.get("https://www.google.com.br");
+  }
+
+  @AfterClass
+  public static void tearDown() {
+    driver.quit();
+  }
 }
