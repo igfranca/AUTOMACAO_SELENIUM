@@ -1,4 +1,4 @@
-package br.com.vivo.primeiraautomacao;
+package br.com.vivo.primeiroteste;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.AfterClass;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 public class CartTests {
 
-  private static WebDriver driver;
+  public static WebDriver driver;
 
   @BeforeClass
   public static void setUp() {
@@ -41,6 +41,8 @@ public class CartTests {
 
     //Clicar no menu 'Celulares'
     driver.findElement(By.xpath("//a[@title='Celulares']")).click();
+
+    driver.findElement(By.xpath("//button[@class='popup-offer-close']")).click();
 
     //Clicar no primeiro aparelho do menu 'Celulares'
     driver.findElement(By.xpath("(//a[@class='product-card product-card--grid'])[2]")).click();
